@@ -1,0 +1,295 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="images\logo\logo01.png" style="border-radius: 10px;">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python-3.14.2</title>
+
+    <!-- font awesome cdn link  -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body background="images\—Pngtree—colorful school supplies border frame_19104013.jpg">
+<canvas id="smokeCanvas"></canvas>
+<script>
+    const canvas = document.getElementById('smokeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const particlesArray = [];
+        let hue = 0;
+
+        const mouse = {
+            x: undefined,
+            y: undefined
+        };
+
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+            
+            // Mouse එක හොලවන විට දුම් අංශු 3ක් බැගින් සාදයි
+            for (let i = 0; i < 3; i++) {
+                particlesArray.push(new Particle());
+            }
+        });
+
+        class Particle {
+            constructor() {
+                this.x = mouse.x;
+                this.y = mouse.y;
+                
+                // දුම හෙමින් විසිරෙන්න (Speed එක ගොඩක් අඩුයි)
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * -0.4 - 0.1; // හෙමින් උඩට යන්න
+                
+                // දුම පටන් ගන්නා ප්‍රමාණය (ලොකුවට පටන් ගත්තම තමයි දුම වගේ පේන්නේ)
+                this.size = Math.random() * 35 + 15; 
+                this.opacity = 0.15; // මුල ඉඳන්ම ගොඩක් ළාවට පටන් ගන්නේ
+                this.hueColor = hue;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.size += 1.2; // උඩට යද්දී දුම් රොදක් වගේ ලොකු වීම
+                this.opacity -= 0.003; // ඉතා හෙමින් මැකී යාම (Sudden remove වෙන්නේ නැහැ)
+            }
+
+            draw() {
+                ctx.save();
+                
+                // 1. Gradient එකක් හදනවා (මැද තදට, පිටතට යද්දී සම්පූර්ණයෙන්ම transparent වෙන්න)
+                let gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,           // මැද ලක්ෂ්‍යය
+                    this.x, this.y, this.size    // පිටත වට ප්‍රමාණය
+                );
+                
+                // 2. Rainbow පාට ළාවට මැදට දෙනවා
+                gradient.addColorStop(0, `hsla(${this.hueColor}, 100%, 60%, ${this.opacity})`);
+                // 3. මැද ඉඳන් ටිකක් දුර යද්දී තවත් ළා කරනවා
+                gradient.addColorStop(0.3, `hsla(${this.hueColor}, 100%, 60%, ${this.opacity * 0.4})`);
+                // 4. කෙළවරටම යද්දී සම්පූර්ණයෙන්ම නොපෙනී යනවා (0 Opacity)
+                gradient.addColorStop(1, `hsla(${this.hueColor}, 100%, 60%, 0)`);
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = gradient; // රවුම පාට කරන්න මේ Gradient එක පාවිච්චි කරනවා
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        function animate() {
+            // Screen එක clear කරනවා හැබැයි පරණ දුමාරයත් එක්ක blend වෙන්න
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                
+                if (particlesArray[i].opacity <= 0) {
+                    particlesArray.splice(i, 1);
+                    i--;
+                }
+            }
+            hue += 5; // පාට මාරු වන වේගය ගොඩක් ස්වභාවිකයි
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+</script>
+<canvas id="snow-canvas"></canvas>
+<script>
+    // Snow particles
+        const canvas1 = document.getElementById('snow-canvas');
+        const ctx1 = canvas1.getContext('2d');
+        let flakes = [];
+        function resize() { 
+            canvas1.width = window.innerWidth; 
+            canvas1.height = window.innerHeight; 
+        }
+        resize(); 
+        window.addEventListener('resize', resize);
+        for (let i = 0; i < 90; i++) 
+        flakes.push(
+                        { 
+                            x: Math.random()*canvas1.width, 
+                            y: Math.random()*canvas1.height, 
+                            r: Math.random()*2.5+1, 
+                            dx: Math.random()*0.4-0.2, 
+                            dy: Math.random()*0.8+0.4, 
+                            o: Math.random()*0.5+0.3 
+                        }
+                    );
+        function drawSnow() {
+            ctx1.clearRect(
+                0,0,canvas1.width,canvas.height
+            );
+            flakes.forEach(
+                f => { 
+                        ctx1.beginPath(); 
+                        ctx1.arc(f.x,f.y,f.r,0,Math.PI*2); 
+                        ctx1.fillStyle=`rgba(255,255,255,${f.o})`; 
+                        ctx1.fill(); 
+                        f.x+=f.dx; 
+                        f.y+=f.dy; 
+                        if(f.y>canvas1.height){
+                            f.y=-5;
+                            f.x=Math.random()*canvas1.width;
+                        } 
+                        if(
+                            f.x>canvas1.width
+                        )
+                        f.x=0; 
+                        if(f.x<0)
+                        f.x=canvas1.width; 
+                    }
+                );
+            requestAnimationFrame(drawSnow);
+        }
+        drawSnow();
+</script>
+<!-- header section starts  -->
+
+<header class="header">
+
+    <a href="index.html" class="logo"> <i class="fas fa-graduation-cap"></i>Bluesoft Educational Collection</a>
+
+    <div id="menu-btn" class="fas fa-bars"></div>
+
+    <nav class="navbar">
+        <ul>
+            <li><a href="index.html">home</a></li>
+            <li><a href="about.html">about</a></li>
+            <li><a href="#">Subjects</a>
+                <ul>
+                    <li><a href="course-1.html">Mathematics</a></li>
+                    <li><a href="course-2.html">Physics</a></li>
+                    <li><a href="course-3.html">Chemistry</a></li>
+                    <li><a href="course-4.html">Pro-lang</a></li>
+                </ul>
+            </li>
+            <li><a href="contact.html">contact</a></li>
+        </ul>
+    </nav>
+
+</header>
+
+<!-- header section ends -->
+
+<section class="heading">
+    <h3>Python</h3>
+    <p> <a href="home.html">home >></a> Python </p>
+</section>
+
+<!-- course-2 section starts  -->
+
+<section class="course-2">
+
+    <div class="box">
+        <div class="image">
+            <img src="python-3.14-docs-html\_static\py.svg" alt="Python logo" style="margin-top: 40px;">
+        </div>
+        <div class="content">
+            <span>One of Programming Languages</span>
+            <h3>Python</h3>
+            <p>Version : 3.14.2</p>
+            <a href="Tutorial-of-python-3.14.2.html" class="btn">view resources</a>
+            <div class="icons">
+                <a href="#"> <i class="fas fa-book"></i> This programming language have many of sections </a>
+                <a href="#"> <i class="fas fa-clock"></i> 2 years to be a top level </a>
+            </div>
+        </div>
+    </div>
+    <div class="box">
+        <div class="image">
+            <img src="python-3.14-docs-html\_static\py.svg" alt="Python logo" style="margin-top: 40px;">
+        </div>
+        <div class="content">
+            <span>One of Programming Languages</span>
+            <h3>Python</h3>
+            <p>Documentries</p>
+            <a href="https://docs.python.org/3/download.html" class="btn">Download the documentration</a>
+            <div class="icons">
+                <a href="#"> <i class="fas fa-book"></i> This programming language have many of sections </a>
+                <a href="#"> <i class="fas fa-clock"></i> 2 years to be a top level </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- course-2 section ends -->
+
+<!-- footer section starts  -->
+
+<section class="footer">
+
+    <div class="box-container">
+
+        <div class="box">
+            <h3>explore</h3>
+            <a href="index.html"> <i class="fas fa-arrow-right"></i> home </a>
+            <a href="about.html"> <i class="fas fa-arrow-right"></i> about </a>
+            <a href="course-1.html"> <i class="fas fa-arrow-right"></i>Mathematics</a>
+            <a href="course-2.html"> <i class="fas fa-arrow-right"></i>Physics</a>
+            <a href="course-3.html"> <i class="fas fa-arrow-right"></i>Chemistry</a>
+            <a href="blog.html"> <i class="fas fa-arrow-right"></i> blog </a>
+            <a href="contact.html"> <i class="fas fa-arrow-right"></i> contact </a>
+        </div>
+
+        <div class="box">
+            <h3>My skills</h3>
+            <a href="#"> <i class="fas fa-arrow-right"></i> web design</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> graphic design</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> UI / UX design</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> Python</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> Node.js</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> electron</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> other</a>
+        </div>
+
+        <div class="box">
+            <h3>quick links</h3>
+            <a href="#"> <i class="fas fa-arrow-right"></i> my account </a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> feedback </a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> help center </a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> certificates </a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> newsletter </a>
+        </div>
+
+        <div class="box">
+            <h3>follow us</h3>
+            <a href="#"> <i class="fab fa-facebook-f"></i> facebook </a>
+            <a href="#"> <i class="fab fa-twitter"></i> twitter </a>
+            <a href="#"> <i class="fab fa-linkedin"></i> linkedin </a>
+            <a href="#"> <i class="fab fa-instagram"></i> instagram </a>
+            <a href="#"> <i class="fab fa-pinterest"></i> pinterest </a>
+            <a href="#"> <i class="fab fa-github"></i> github </a>
+        </div>
+
+    </div>
+
+    <div class="credit"> created by <span>R.M.T Hashan Rajapaksha</span> | all rights reserved! </div>
+
+</section>
+
+<!-- footer section ends -->
+
+<!-- custom js file link  -->
+<script src="js/script.js"></script>
+
+</body>
+</html>

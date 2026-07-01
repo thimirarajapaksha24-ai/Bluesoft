@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="images\logo\logo01.png" style="border-radius: 10px;">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>more about us</title>
+
+    <!-- font awesome cdn link  -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body background="images\—Pngtree—colorful school supplies border frame_19104013.jpg">
+<canvas id="smokeCanvas"></canvas>
+<script>
+    const canvas = document.getElementById('smokeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const particlesArray = [];
+        let hue = 0;
+
+        const mouse = {
+            x: undefined,
+            y: undefined
+        };
+
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+            
+            // Mouse එක හොලවන විට දුම් අංශු 3ක් බැගින් සාදයි
+            for (let i = 0; i < 3; i++) {
+                particlesArray.push(new Particle());
+            }
+        });
+
+        class Particle {
+            constructor() {
+                this.x = mouse.x;
+                this.y = mouse.y;
+                
+                // දුම හෙමින් විසිරෙන්න (Speed එක ගොඩක් අඩුයි)
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * -0.4 - 0.1; // හෙමින් උඩට යන්න
+                
+                // දුම පටන් ගන්නා ප්‍රමාණය (ලොකුවට පටන් ගත්තම තමයි දුම වගේ පේන්නේ)
+                this.size = Math.random() * 35 + 15; 
+                this.opacity = 0.15; // මුල ඉඳන්ම ගොඩක් ළාවට පටන් ගන්නේ
+                this.hueColor = hue;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.size += 1.2; // උඩට යද්දී දුම් රොදක් වගේ ලොකු වීම
+                this.opacity -= 0.003; // ඉතා හෙමින් මැකී යාම (Sudden remove වෙන්නේ නැහැ)
+            }
+
+            draw() {
+                ctx.save();
+                
+                // 1. Gradient එකක් හදනවා (මැද තදට, පිටතට යද්දී සම්පූර්ණයෙන්ම transparent වෙන්න)
+                let gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,           // මැද ලක්ෂ්‍යය
+                    this.x, this.y, this.size    // පිටත වට ප්‍රමාණය
+                );
+                
+                // 2. Rainbow පාට ළාවට මැදට දෙනවා
+                gradient.addColorStop(0, `hsla(${this.hueColor}, 100%, 60%, ${this.opacity})`);
+                // 3. මැද ඉඳන් ටිකක් දුර යද්දී තවත් ළා කරනවා
+                gradient.addColorStop(0.3, `hsla(${this.hueColor}, 100%, 60%, ${this.opacity * 0.4})`);
+                // 4. කෙළවරටම යද්දී සම්පූර්ණයෙන්ම නොපෙනී යනවා (0 Opacity)
+                gradient.addColorStop(1, `hsla(${this.hueColor}, 100%, 60%, 0)`);
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = gradient; // රවුම පාට කරන්න මේ Gradient එක පාවිච්චි කරනවා
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        function animate() {
+            // Screen එක clear කරනවා හැබැයි පරණ දුමාරයත් එක්ක blend වෙන්න
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                
+                if (particlesArray[i].opacity <= 0) {
+                    particlesArray.splice(i, 1);
+                    i--;
+                }
+            }
+            hue += 5; // පාට මාරු වන වේගය ගොඩක් ස්වභාවිකයි
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+</script>
+<canvas id="snow-canvas"></canvas>
+<script>
+    // Snow particles
+        const canvas1 = document.getElementById('snow-canvas');
+        const ctx1 = canvas1.getContext('2d');
+        let flakes = [];
+        function resize() { 
+            canvas1.width = window.innerWidth; 
+            canvas1.height = window.innerHeight; 
+        }
+        resize(); 
+        window.addEventListener('resize', resize);
+        for (let i = 0; i < 90; i++) 
+        flakes.push(
+                        { 
+                            x: Math.random()*canvas1.width, 
+                            y: Math.random()*canvas1.height, 
+                            r: Math.random()*2.5+1, 
+                            dx: Math.random()*0.4-0.2, 
+                            dy: Math.random()*0.8+0.4, 
+                            o: Math.random()*0.5+0.3 
+                        }
+                    );
+        function drawSnow() {
+            ctx1.clearRect(
+                0,0,canvas1.width,canvas.height
+            );
+            flakes.forEach(
+                f => { 
+                        ctx1.beginPath(); 
+                        ctx1.arc(f.x,f.y,f.r,0,Math.PI*2); 
+                        ctx1.fillStyle=`rgba(255,255,255,${f.o})`; 
+                        ctx1.fill(); 
+                        f.x+=f.dx; 
+                        f.y+=f.dy; 
+                        if(f.y>canvas1.height){
+                            f.y=-5;
+                            f.x=Math.random()*canvas1.width;
+                        } 
+                        if(
+                            f.x>canvas1.width
+                        )
+                        f.x=0; 
+                        if(f.x<0)
+                        f.x=canvas1.width; 
+                    }
+                );
+            requestAnimationFrame(drawSnow);
+        }
+        drawSnow();
+</script>
+<!-- header section starts  -->
+
+<header class="header">
+
+    <a href="index.html" class="logo"> <i class="fas fa-graduation-cap"></i>Bluesoft Educational Collection</a>
+
+    <div id="menu-btn" class="fas fa-bars"></div>
+
+    <nav class="navbar">
+        <ul>
+            <li><a href="index.html">home</a></li>
+            <li><a href="about.html">about</a></li>
+            <li><a href="#">courses +</a>
+                <ul>
+                    <li><a href="course-1.html">Mathematics</a></li>
+                    <li><a href="course-2.html">Physics</a></li>
+                    <li><a href="course-3.html">Chemistry</a></li>
+                    <li><a href="course-4.html">Pro-lang</a></li>
+                </ul>
+            </li>
+            <li><a href="contact.html">contact</a></li>
+        </ul>
+    </nav>
+
+</header>
+
+<!-- header section ends -->
+
+<section class="heading" id="cinematic_head">
+    <h3>about us</h3>
+    <p> <a href="home.html">home >></a> <a href="about.html">about</a> >> more info</p>
+</section>
+
+<!-- about section starts  -->
+
+<section class="about">
+
+    <div class="image">
+        <img src="images\SVG_about.png" alt="">
+    </div>
+
+    <div class="content">
+        <h3 class="hy">More info about this site!</h3>
+        <p>A student's go-to blog for the latest stories,
+            discoveries, fun activities, exam tips, and more.
+            Take the next step toward your personal and professional goals with Brighty Nerd.</p>
+        <a href="about.html" class="btn">Go To Back Page ↩</a>
+    </div>
+    <section>
+        <div class="cinematic">
+            <h3 style="font-size: 250%; color: aliceblue; text-shadow: 0 0 50% rgb(255,255,255);">
+                A Student-Centric Educational Resource Platform
+            </h3><br><br>
+            <h2 class="cinematic_heading_info">
+                Introduction</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Education in the modern era is no longer confined to the four walls of a classroom. The rapid expansion of the internet and the availability of digital tools have transformed the way students access knowledge, share materials, and prepare for examinations. In Sri Lanka, where Advanced Level and Ordinary Level students often face challenges in finding organized, reliable, and freely accessible study materials, the need for a centralized digital repository is more pressing than ever.
+
+                <br><br>
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                    Bluesoftedup was conceived as a response to this need. It is a student-driven initiative aimed at collecting, organizing, and distributing high-quality educational resources for students across Sri Lanka. The platform is hosted on GitHub Pages, ensuring that it remains free, fast, and accessible to anyone with an internet connection. This document serves as a comprehensive overview of the project, its purpose, its structure, the philosophy behind it, and the future direction in which it intends to grow.
+            </p>
+                
+                
+                <br><br>
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                    The name "Bluesoftedup" itself reflects the project’s identity. "Blue" symbolizes calmness, clarity, and trust—qualities that are essential in learning. "Soft" represents the soft approach to education, where students are guided rather than forced. "Edu" is short for education, and "p" hints at platform and progress. Together, Bluesoftedup represents a calm, reliable, and progressive space for learning.
+            </p>
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                The Problem We Are Solving</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Sri Lankan students, particularly those preparing for G.C.E. Advanced Level examinations, face several recurring issues when it comes to study materials:
+
+First, there is a fragmentation of resources. Notes, past papers, marking schemes, and model answers are scattered across WhatsApp groups, Facebook pages, Telegram channels, and various personal websites. Finding a specific paper from 2019 or a well-explained set of notes on Organic Chemistry often becomes a time-consuming scavenger hunt.
+<br><br>
+<p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Second, the quality and accuracy of shared materials vary significantly. Some notes are incomplete, outdated, or contain errors. Students who rely on these without verification risk misunderstanding key concepts, which can directly affect their examination performance.
+<br><br>
+Third, access is inconsistent. Many resources are shared in closed groups where new students cannot join, or they are deleted after a certain period. Others are behind paywalls or require mobile data for heavy downloads, which is a barrier for students in rural areas.
+<br><br>
+Fourth, there is a lack of organization. Even when students find resources, they are often poorly labeled, mixed across subjects, and difficult to navigate. A student preparing for Physics Paper 2 should not have to scroll through 200 unrelated files to find what they need.
+<br><br>
+Bluesoftedup addresses these four problems by providing a single, organized, permanent, and free platform where resources are curated, labeled, and categorized by subject, year, and paper type. The goal is to reduce the time students spend searching and increase the time they spend learning.
+
+                </p>
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Why GitHub Pages?</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                When building an educational platform, the choice of hosting is critical. Paid hosting offers flexibility but introduces recurring costs that are unsustainable for a student-run project. Free hosting services often come with forced advertisements, low uptime, and strict limitations.
+<br><br>
+GitHub Pages was chosen for several reasons that align perfectly with the project’s goals:
+<br><br>
+Cost: GitHub Pages is completely free with no credit card required. There are no hidden fees, no renewal charges, and no risk of the site being taken down due to non-payment.
+<br><br>
+Speed and Reliability: GitHub’s infrastructure is built to handle millions of requests. Pages served from GitHub’s CDN load quickly across Sri Lanka and internationally. Uptime is consistently above 99.9%.
+<br><br>
+Version Control: Every change to the site is tracked through Git. If a file is accidentally deleted or modified incorrectly, it can be restored to a previous version. This is crucial for maintaining data integrity over years.
+<br><br>
+Static Site Performance: Bluesoftedup is built as a static site using HTML, CSS, and JavaScript. Static sites have no server-side processing, which means they are inherently fast and secure. There are no databases to hack, no PHP vulnerabilities to patch, and no server maintenance required.
+<br><br>
+Capacity: Each repository can store up to 1GB of data, with 100GB of bandwidth per month. For a text and PDF-based educational site, this is more than sufficient. Large video files can be hosted externally on YouTube or Google Drive and embedded as needed.
+<br><br>
+Transparency: Since the project is open on GitHub, any student, teacher, or developer can inspect the code, suggest improvements, or contribute content. This builds trust and community ownership.
+<br><br>
+The only limitation is that GitHub Pages does not support server-side languages like PHP or databases like MySQL directly. For Bluesoftedup, this is not a disadvantage because the core mission is to distribute static educational content. If dynamic features like login systems or comment sections are needed in the future, they can be added by connecting to an external API hosted on services like InfinityFree or HelioHost.
+
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Structure of the Platform</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Bluesoftedup is organized to mirror the way students think about their studies. The navigation and folder structure are designed to minimize clicks and maximize clarity.
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Subject-Based Organization</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                The homepage presents a clear list of subjects offered at the G.C.E. Advanced Level. Each subject has its own dedicated page. For example:
+<br><br>
+Physics: Theory notes, practical guides, past papers from 2010 to 2024, marking schemes, model answers, and formula sheets.
+Chemistry: Inorganic, Organic, and Physical Chemistry notes, lab report templates, past papers, and reaction mechanisms.
+Combined Mathematics: Pure Math and Applied Math notes, theorems, past papers, and worked examples.
+Biology: Botany, Zoology, and Human Physiology notes, diagrams, past papers, and practical guides.
+This structure ensures that a student studying for Chemistry Paper 1 in 2023 can navigate directly to Chemistry > 2023 > Paper 1 without confusion.
+
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                File Naming Convention</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Consistency is key to making resources searchable. All files follow a strict naming convention:
+Subject_Year_Paper_Type_Version.pdf
+<br><br>
+Example: Chemistry_2023_Paper1_MCQs_Final.pdf
+<br><br>
+This allows students to quickly identify the content of a file without opening it. It also helps with SEO and internal search functionality.
+
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                User Experience Design</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                The website’s design prioritizes readability and mobile compatibility. Over 80% of Sri Lankan students access educational content via mobile phones. Therefore, the layout is responsive, buttons are large enough for touch input, and PDF previews are optimized for low-bandwidth connections.
+<br><br>
+Colors are kept minimal to reduce eye strain during long study sessions. The use of dark mode is being considered for future updates to support night studying.
+
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Content Curation Process</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+        Not every file received is uploaded immediately. Each submission goes through a basic curation process:
+<br><br>
+Verification: Check that the file matches the claimed subject, year, and paper.
+Quality Check: Ensure that scans are legible, pages are in order, and there are no missing sections.
+Deduplication: Avoid uploading duplicate files that already exist on the site.
+Tagging: Add metadata tags for search functionality.
+This process ensures that students can trust the materials they download from Bluesoftedup.
+        
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Educational Philosophy</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Bluesoftedup is built on the belief that education should be a collaborative and open process. Knowledge grows when it is shared, and barriers to access only slow down collective progress.
+<br><br>
+The platform does not promote rote memorization. Instead, it encourages understanding by providing multiple resources for the same topic. For instance, a student struggling with Newton’s Laws can find three different sets of notes: one from a teacher, one from a top student, and one with diagrams and animations. Different explanations work for different learners.
+<br><br>
+We also emphasize ethical use. All past papers uploaded are publicly available through the Department of Examinations or shared by students who sat for the exam. No confidential or leaked materials are hosted. The goal is to support legal and fair preparation.
+<br><br>
+Furthermore, Bluesoftedup aims to bridge the urban-rural divide. Students in Colombo have access to tuition classes, libraries, and bookshops. Students in Monaragala or Kilinochchi do not. By providing free digital resources, we level the playing field to some extent.
+
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Technical Implementation</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                The site is built using vanilla HTML5, CSS3, and JavaScript. No heavy frameworks like React or Vue are used to keep the bundle size small and loading times fast.
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                HTML Structure</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Each subject page is a static HTML file with semantic tags. This improves accessibility for screen readers and helps search engines index the content correctly. Headings follow a logical hierarchy: h1 for the subject name, h2 for years, h3 for paper types.
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                CSS Styling</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                CSS is kept modular. A main stylesheet handles global styles like fonts, colors, and layout. Subject-specific styles are minimal to avoid bloating the CSS file. Flexbox and CSS Grid are used for responsive layouts.
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                JavaScript Functionality</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                JavaScript is used sparingly for enhancing user experience. Features include:
+<br><br>
+Search bar that filters files in real-time without reloading the page.
+Dark mode toggle that saves user preference in localStorage.
+PDF preview modal to view files without downloading them.
+Lazy loading for images and PDFs to improve initial load time.
+All scripts are written to be non-blocking and are placed at the end of the body to ensure that content renders before functionality loads.
+
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Version Control Workflow</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Changes are made locally, tested, and then pushed to the main branch of the GitHub repository. GitHub Actions can be configured in the future to automatically check for broken links and validate HTML before deployment.
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Limitations and Challenges</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                No project is without limitations, and acknowledging them is important for transparency and growth.
+<br><br>
+The primary limitation is the static nature of GitHub Pages. Features like user accounts, commenting, file uploads, and dynamic search require a backend. Implementing these would mean introducing a separate backend service, which adds complexity and potential points of failure.
+<br><br>
+Another challenge is content sourcing. While many students are willing to share their notes, there is hesitation due to concerns about plagiarism and ownership. Building a culture of sharing requires trust, which is earned slowly through consistent, ethical operation.
+<br><br>
+Bandwidth limits, while generous, can become a constraint if the site goes viral or if large video files are hosted directly. This is mitigated by using external hosting for large media and by compressing PDFs before upload.
+<br><br>
+Finally, maintenance is a long-term commitment. A website is not a one-time project. Broken links need fixing, outdated materials need removal, and new papers need adding every year. The project’s sustainability depends on building a small team of contributors.
+
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Future Roadmap</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Bluesoftedup is not a finished product. It is a living platform that will evolve based on student needs and technological possibilities.
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Short Term Goals 6-12 Months</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Expand Subject Coverage: Add resources for subjects like Economics, Accounting, ICT, and General English.
+Improve Search: Implement client-side search using <a href="http://Lunr.js" style="color: cornflowerblue;">http://Lunr.js</a> or <a href="http://Fuse.js" style="color: cornflowerblue;">http://Fuse.js</a> to allow keyword search across all PDFs and notes.
+Mobile App Prototype: Create a simple Progressive Web App version so students can install the site on their phones and access it offline.
+Contributor System: Create a Google Form and guideline document for students to submit notes safely and anonymously.
+Medium Term Goals 1-2 Years
+<br><br>
+Interactive Content: Add quizzes, flashcards, and spaced repetition tools for subjects like Vocabulary and Formulas.
+Video Integration: Curate and embed high-quality YouTube tutorials for each topic, with timestamps linked to notes.
+Analytics: Use privacy-respecting analytics to understand which subjects and papers are most accessed, helping prioritize curation efforts.
+Multilingual Support: Add Sinhala and Tamil explanations for key concepts to support students studying in their mother tongue.
+
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Long Term Vision 3-5 Years</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                The long-term vision is to transform Bluesoftedup from a repository into a community-driven learning ecosystem. This includes peer tutoring forums, live Q&A sessions with teachers, and AI-assisted study planners. The foundation for this is the trust and content base being built now.
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                How You Can Contribute</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Bluesoftedup belongs to the student community. Its success depends on contributions from people like you.
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Contributing Notes and Papers</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                If you have well-organized notes, past papers, or model answers, you can contribute by:
+
+Ensuring the file is clear, complete, and correctly labeled.
+Filling out the submission form on the website.
+Specifying whether you want to be credited or remain anonymous.
+Contributing Code
+<br><br>
+If you have web development skills, you can contribute to the codebase by:
+<br><br>
+Forking the repository on GitHub.
+Creating a new branch for your feature or fix.
+Submitting a pull request with a clear description of changes.
+Good first issues include fixing typos, improving mobile responsiveness, and adding new subject pages.
+
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Spreading the Word</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                The simplest way to help is to share the website with classmates, teachers, and school groups. The more students who use and benefit from the platform, the more motivation there is to keep it updated and improved.
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Legal and Ethical Considerations</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Bluesoftedup operates under the principle of fair use for educational purposes. All materials are either created by contributors, publicly available, or shared with permission.
+<br><br>
+If you are a copyright holder and believe that material on the site infringes your rights, please contact us through the email provided on the website. We will review and remove the content promptly if required.
+<br><br>
+We do not host answer keys for exams that have not yet been conducted. Academic integrity is a core value, and the platform will not be used to facilitate cheating.
+
+                </p><br>
+
+            <h2 class="cinematic_heading_info">
+                Conclusion</h2><hr class="animated-line">
+                <p style="font-size: 16px; text-align: justify;" class="cinematic_para_more_info">
+                Bluesoftedup represents a small but meaningful step toward democratizing education in Sri Lanka. By leveraging free technology, community contributions, and a student-first design philosophy, it aims to reduce barriers to learning and empower students to take control of their academic journey.
+<br><br>
+The project started as a single repository with a handful of PDF files. Its future depends on whether students see value in it and choose to participate in building it further. Education is not a zero-sum game. When one student shares a good set of notes, thousands can benefit without diminishing the original creator’s knowledge.
+<br><br>
+If you are reading this, you are already part of the Bluesoftedup story. Whether you are here to download a paper, to contribute your notes, or to improve the code, your involvement matters. Let’s build a platform that makes learning less stressful, more accessible, and genuinely enjoyable.
+<br><br>
+For updates, contributions, and contact information, visit the GitHub repository at <a href="https://github.com/thimirarajapaksha24-ai/Bluesoftedup">Bluesoftedup</a>.
+
+                </p>
+                <br><br><br>
+
+                <a href="#cinematic_head" class="btn">Go To above of the Page ⬆</a>
+        </div>
+    </section>
+</section>
+
+<!-- about section ends -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- footer section starts  -->
+
+<section class="footer">
+
+    <div class="box-container">
+
+        <div class="box">
+            <h3>explore</h3>
+            <a href="index.html"> <i class="fas fa-arrow-right"></i> home </a>
+            <a href="about.html"> <i class="fas fa-arrow-right"></i> about </a>
+            <a href="course-1.html"> <i class="fas fa-arrow-right"></i>Mathematics</a>
+            <a href="course-2.html"> <i class="fas fa-arrow-right"></i>Physics</a>
+            <a href="course-3.html"> <i class="fas fa-arrow-right"></i>Chemistry</a>
+            <a href="blog.html"> <i class="fas fa-arrow-right"></i> blog </a>
+            <a href="contact.html"> <i class="fas fa-arrow-right"></i> contact </a>
+        </div>
+
+        <div class="box">
+            <h3>My skills</h3>
+            <a href="#"> <i class="fas fa-arrow-right"></i> web design</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> graphic design</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> UI / UX design</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> Python</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> Node.js</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> electron</a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> other</a>
+        </div>
+
+        <div class="box">
+            <h3>quick links</h3>
+            <a href="#"> <i class="fas fa-arrow-right"></i> my account </a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> feedback </a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> help center </a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> certificates </a>
+            <a href="#"> <i class="fas fa-arrow-right"></i> newsletter </a>
+        </div>
+
+        <div class="box">
+            <h3>follow us</h3>
+            <a href="#"> <i class="fab fa-facebook-f"></i> facebook </a>
+            <a href="#"> <i class="fab fa-twitter"></i> twitter </a>
+            <a href="#"> <i class="fab fa-linkedin"></i> linkedin </a>
+            <a href="#"> <i class="fab fa-instagram"></i> instagram </a>
+            <a href="#"> <i class="fab fa-pinterest"></i> pinterest </a>
+            <a href="#"> <i class="fab fa-github"></i> github </a>
+        </div>
+
+    </div>
+
+    <div class="credit"> created by <span>R.M.T Hashan Rajapaksha</span> | all rights reserved! </div>
+
+</section>
+
+<!-- footer section ends -->
+
+<!-- custom js file link  -->
+<script src="js/script.js"></script>
+
+</body>
+</html>
