@@ -1,0 +1,28 @@
+{
+  "name": "fluent-calculator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build":"electron-packager . --platform=win32 --arch=x64 --out=dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^42.3.3"
+  },
+  "devDependencies": {
+    "electron-packager": "^17.1.2"
+  },
+  "build":{
+    "appId":"com.fluent.calculator",
+    "productName":"Fluent Calculator",
+    "win":{
+      "target":["protable"],
+      "icon":"fluent_logo.ico"
+    }
+  }
+}

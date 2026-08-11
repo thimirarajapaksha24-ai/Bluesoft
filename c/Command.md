@@ -1,0 +1,1 @@
+npx electron-packager . FluentCalculator --platform=win32 --arch=x64 --icon=fluent_logo.ico --overwrite
